@@ -20,6 +20,7 @@ import sympy
 from sympy.core import numbers as sympy_numbers
 from cirq._compat import proper_repr
 from cirq._doc import document
+from cirq import protocols
 
 if TYPE_CHECKING:
     import cirq
@@ -153,6 +154,13 @@ class ParamResolver:
 
         # No known way to resolve this variable, return unchanged.
         return value
+
+    def _resolve_parameters_(self, param_resolver: 'ParamResolver'
+                            ) -> 'ParamResolver':
+        return ParamResolver({
+            k: protocols.resolve_parameters(v, param_resolver)
+            for k, v in self.param_dict.items()
+        })
 
     def __iter__(self) -> Iterator[Union[str, sympy.Symbol]]:
         return iter(self.param_dict)
